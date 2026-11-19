@@ -1,0 +1,49 @@
+# Todos los valores sensibles se leen de variables de entorno.
+# Los valores después de ":" son SOLO para desarrollo local.
+server:
+  port: ${PORT:8080}
+  error:
+    include-stacktrace: never
+    include-message: never
+
+spring:
+  application:
+    name: pokestore-api
+  datasource:
+    # MySQL en el puerto 3307 (el 3306 está ocupado en Duoc).
+    # DB_PARAMS permite cambiar los parámetros de conexión en producción (ej: sslMode=REQUIRED para RDS)
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3307}/${DB_NAME:pokestore}?${DB_PARAMS:createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Santiago}
+    username: ${DB_USER:pokestore}
+    password: ${DB_PASSWORD:pokestore123}
+  jpa:
+    hibernate:
+      ddl-auto: update   # en producción usar "validate" + migraciones (Flyway)
+    open-in-view: false
+    show-sql: false
+
+# Swagger: activo en desarrollo. En producción poner SWAGGER_ENABLED=false
+springdoc:
+  api-docs:
+    enabled: ${SWAGGER_ENABLED:true}
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: ${SWAGGER_ENABLED:true}
+    path: /swagger-ui.html
+    operations-sorter: method
+    display-request-duration: true
+  default-produces-media-type: application/json
+
+app:
+  jwt:
+    # Mínimo 32 caracteres. Si se deja vacío se genera una clave aleatoria al iniciar
+    # (los tokens dejan de servir cada vez que se reinicia la API).
+    secret: ${JWT_SECRET:}
+    expiration-minutes: ${JWT_EXPIRATION_MINUTES:120}
+  cors:
+    # Orígenes permitidos separados por coma
+    allowed-origins: ${CORS_ORIGINS:http://localhost:5173}
+  seed:
+    admin-email: ${ADMIN_EMAIL:admin@pokestore.cl}
+    admin-password: ${ADMIN_PASSWORD:Admin1234}
+    user-email: ${DEMO_USER_EMAIL:ash@pokemon.com}
+    user-password: ${DEMO_USER_PASSWORD:Pikachu123}

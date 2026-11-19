@@ -1,0 +1,26 @@
+# MySQL para desarrollo en el puerto 3307 del PC (el 3306 está ocupado en Duoc).
+# Uso:  docker compose up -d
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: pokestore-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root123}
+      MYSQL_DATABASE: pokestore
+      MYSQL_USER: ${DB_USER:-pokestore}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-pokestore123}
+      TZ: America/Santiago
+    ports:
+      # 127.0.0.1 = solo accesible desde este PC, NO desde la red de Duoc
+      - "127.0.0.1:3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mysql_data:
